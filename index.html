@@ -53,6 +53,10 @@
     .app-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
     .app-section h2 { font-size: 1.35rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
 
+    /* Progress Bar */
+    .progress-container { background: #E2E8F0; border-radius: 10px; height: 10px; width: 100%; margin-bottom: 1rem; overflow: hidden; }
+    .progress-bar { background: var(--accent-green); height: 100%; width: 0%; transition: width 0.3s ease; }
+
     /* Forms & Inputs */
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; }
@@ -86,6 +90,12 @@
     .cal-day { min-height: 55px; border: 1px solid #E2E8F0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; padding-top: 6px; font-size: 0.85rem; background: white; }
     .cal-day span { font-weight: 500; }
 
+    /* Pricing Section */
+    .pricing-section { max-width: 800px; margin: 0 auto 4rem; padding: 0 1.5rem; text-align: center; }
+    .pricing-card { background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%); color: white; padding: 3rem 2rem; border-radius: var(--border-radius); box-shadow: 0 20px 25px -5px rgba(124, 58, 237, 0.2); }
+    .pricing-card h2 { font-size: 2rem; margin-bottom: 1rem; }
+    .price { font-size: 3rem; font-weight: 700; margin: 1.5rem 0; }
+
     footer { text-align: center; padding: 2.5rem; color: var(--text-muted); font-size: 0.875rem; background: white; border-top: 1px solid #E2E8F0; }
 
     @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
@@ -98,7 +108,7 @@
     <span class="hero-badge">🚀 Tu año escolar bajo control</span>
     <h1>Organizá tu día a tu manera, sin el estrés de olvidar nada.</h1>
     <p>Una herramienta minimalista, rápida y diseñada para acompañarte en tu ritmo diario.</p>
-    <a href="#app-section" class="btn-primary">Empezar a organizar</a>
+    <a href="#pricing" class="btn-primary">Obtener acceso prémium</a>
   </header>
 
   <!-- BENEFICIOS -->
@@ -147,9 +157,21 @@
         </form>
       </section>
 
-      <!-- SECCIÓN 2: LISTA DE ACTIVIDADES -->
+      <!-- SECCIÓN 2: LISTA DE ACTIVIDADES Y PROGRESO -->
       <section class="app-section">
         <h2>📚 Mis actividades</h2>
+        
+        <!-- Barra de Progreso -->
+        <div style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
+            <span>Progreso general</span>
+            <span id="progress-text">0% completado</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+        </div>
+
         <div class="filters">
           <button class="filter-btn active" onclick="filterTasks('todas')">Todas</button>
           <button class="filter-btn" onclick="filterTasks('Normal')">Normales</button>
@@ -189,6 +211,20 @@
     </div>
   </div>
 
+  <!-- SECCIÓN DE VENTAS / PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-card">
+      <h2>Llevá tu productividad al siguiente nivel</h2>
+      <p>Obtené acceso vitalicio a todas las actualizaciones, diseño exclusivo y soporte directo.</p>
+      <div class="price">$4.990 ARS</div>
+      <a href="https://wa.me/5491112345678?text=¡Hola!%20Quiero%20comprar%20el%20acceso%20a%20Ordenando%20mis%20actividades" 
+         target="_blank" 
+         style="background: white; color: var(--primary); padding: 1rem 2.5rem; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+         Comprar por WhatsApp 📲
+      </a>
+    </div>
+  </section>
+
   <footer>
     Hecho para acompañarte en tu camino escolar 🌈
   </footer>
@@ -210,7 +246,8 @@
         id: Date.now(),
         title: document.getElementById('task-title').value.trim(),
         date: document.getElementById('task-date').value,
-        priority: document.getElementById('task-priority').value
+        priority: document.getElementById('task-priority').value,
+        completed: false
       };
       
       tasks.push(newTask);
@@ -223,10 +260,16 @@
       renderTasks();
       renderReminders();
       renderCalendar();
+      updateProgress();
     }
 
     function deleteTask(id) {
       tasks = tasks.filter(t => t.id !== id);
+      saveAndRender();
+    }
+
+    function toggleComplete(id) {
+      tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
       saveAndRender();
     }
 
@@ -235,6 +278,18 @@
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
       renderTasks();
+    }
+
+    function updateProgress() {
+      if (tasks.length === 0) {
+        document.getElementById('progress-bar').style.width = '0%';
+        document.getElementById('progress-text').textContent = '0% completado';
+        return;
+      }
+      const completedCount = tasks.filter(t => t.completed).length;
+      const percentage = Math.round((completedCount / tasks.length) * 100);
+      document.getElementById('progress-bar').style.width = percentage + '%';
+      document.getElementById('progress-text').textContent = `${percentage}% completado`;
     }
 
     function renderTasks() {
@@ -252,10 +307,14 @@
         
         const li = document.createElement('li');
         li.className = 'task-item';
+        li.style.opacity = task.completed ? '0.6' : '1';
         li.innerHTML = `
-          <div class="task-info">
-            <h4>${task.title}</h4>
-            <p>📅 Vence: <strong>${formattedDate}</strong></p>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="toggleComplete(${task.id})" style="width: 18px; height: 18px; cursor: pointer;">
+            <div class="task-info">
+              <h4 style="text-decoration: ${task.completed ? 'line-through' : 'none'};">${task.title}</h4>
+              <p>📅 Vence: <strong>${formattedDate}</strong></p>
+            </div>
           </div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
@@ -272,6 +331,7 @@
       today.setHours(0,0,0,0);
 
       const upcoming = tasks.filter(t => {
+        if (t.completed) return false;
         const [y, m, d] = t.date.split('-');
         const taskDate = new Date(y, m - 1, d);
         const diffDays = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
@@ -279,7 +339,7 @@
       }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
       if (upcoming.length === 0) {
-        remindersContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">¡Todo al día! Sin tareas para los próximos 7 días.</p>';
+        remindersContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">¡Todo al día! Sin tareas urgentes para los próximos 7 días.</p>';
         return;
       }
 
@@ -293,7 +353,7 @@
             <strong>${t.title}</strong> 
             <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Vencimiento: ${d}/${m}/${y}</span>
           </div>
-          <span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>
+          <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
         `;
         remindersContainer.appendChild(div);
       });
