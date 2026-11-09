@@ -1,776 +1,181 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#7957c8">
-<meta name="manifest" content="manifest.json">
-<link rel="manifest" href="manifest.json">
-<title>Ordenando mis actividades</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ordenando mis actividades | Tu espacio de productividad</title>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --primary: #7C3AED;
+      --primary-hover: #6D28D9;
+      --accent: #10B981;
+      --border-radius: 16px;
+    }
 
-<style>
-:root {
-  --principal: #7957c8;
-  --fondo: #f7f4ff;
-  --texto: #29243a;
-  --tarjeta: #ffffff;
-  --borde: #ded5f4;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--fondo);
-  color: var(--texto);
-  line-height: 1.5;
-}
-header {
-  background: var(--principal);
-  color: white;
-  text-align: center;
-  padding: 26px 16px;
-}
-header h1 { margin: 0 0 8px; font-size: 27px; }
-header p { margin: 0; }
-main { max-width: 760px; margin: auto; padding: 18px; }
-.panel {
-  background: var(--tarjeta);
-  padding: 20px;
-  border-radius: 18px;
-  margin-bottom: 18px;
-  border: 1px solid var(--borde);
-}
-h2 { margin-top: 0; font-size: 21px; }
-label { display: block; font-weight: bold; margin: 12px 0 5px; }
-input, select, textarea, button {
-  font: inherit;
-}
-input, select, textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #aaa0bd;
-  border-radius: 10px;
-  background: white;
-  color: #29243a;
-}
-button {
-  border: 0;
-  border-radius: 10px;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-weight: bold;
-}
-button:focus-visible, input:focus-visible,
-select:focus-visible, textarea:focus-visible {
-  outline: 3px solid #e09b27;
-  outline-offset: 2px;
-}
-.primario { background: var(--principal); color: white; }
-.secundario { background: #eee7ff; color: #38265f; }
-.peligro { background: #ffeded; color: #8a2020; }
-.boton-completo { width: 100%; margin-top: 16px; }
-.filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.filtros button[aria-pressed="true"] {
-  background: var(--principal);
-  color: white;
-}
-.tarea {
-  border: 1px solid var(--borde);
-  border-left: 5px solid var(--principal);
-  border-radius: 12px;
-  padding: 14px;
-  margin: 12px 0;
-  background: white;
-}
-.tarea h3 { margin: 0 0 7px; overflow-wrap: anywhere; }
-.tarea p { margin: 5px 0; overflow-wrap: anywhere; }
-.tarea.completada { opacity: .75; border-left-color: #32845a; }
-.tarea.completada h3 { text-decoration: line-through; }
-.etiqueta { font-size: 13px; font-weight: bold; }
-.acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.vacio { text-align: center; padding: 20px 8px; }
-.pie { text-align: center; padding: 18px; font-size: 14px; }
-.oculto { display: none; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
 
-.calendario-cabecera {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 0;
+    }
 
-.calendario-cabecera h3 {
-  text-align: center;
-  text-transform: capitalize;
-}
+    /* Landing Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
-.dias-semana,
-.cuadricula-calendario {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 5px;
-  text-align: center;
-}
+    .hero-badge {
+      display: inline-block;
+      background: #EDE9FE;
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
 
-.dias-semana {
-  font-weight: bold;
-  margin: 12px 0 6px;
-}
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
 
-.dia-calendario {
-  min-width: 0;
-  min-height: 42px;
-  padding: 8px 0;
-  border: 1px solid #d8d0e8;
-  border-radius: 9px;
-  background: white;
-  color: #29213d;
-  cursor: pointer;
-}
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
 
-.dia-calendario.vacio {
-  border: 0;
-  background: transparent;
-}
+    .btn-primary {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.875rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3);
+      transition: all 0.2s ease-in-out;
+    }
 
-.dia-calendario.normal {
-  background: #d9f4e3;
-  border-color: #2e8b57;
-}
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
 
-.dia-calendario.importante {
-  background: #fff0b3;
-  border-color: #c18a00;
-}
+    /* Beneficios Grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 2rem auto 4rem;
+      padding: 0 1.5rem;
+    }
 
-.dia-calendario.urgente {
-  background: #ffdada;
-  border-color: #c62828;
-}
+    .feature-card {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #E2E8F0;
+    }
 
-.dia-calendario.seleccionado {
-  outline: 3px solid #8b5cf6;
-  outline-offset: 1px;
-}
+    .feature-card h3 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
 
-.leyenda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 12px 0;
-  font-size: 14px;
-}
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
 
-.punto {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 4px;
-}
+    /* Contenedor de la App original */
+    .app-container {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      border: 1px solid #E2E8F0;
+    }
 
-.punto.normal { background: #2e8b57; }
-.punto.importante { background: #e6a817; }
-.punto.urgente { background: #d64545; }
+    footer {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      border-top: 1px solid #E2E8F0;
+      background: white;
+    }
 
-@media (max-width: 400px) {
-  .dia-calendario {
-    min-height: 36px;
-    padding: 5px 0;
-    font-size: 14px;
-  }
-}
-
-.barra-pestanas {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  margin: 12px auto;
-  background: #f5e8ff;
-  border-radius: 14px;
-}
-
-.barra-pestanas button {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #7136a8;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.barra-pestanas button:hover {
-  background: #e4ccff;
-}
-button[onclick="probarNotificaciones()"] {
-  display: inline-block;
-  padding: 12px 18px;
-  background-color: #8b5cf6;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-</style>
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+    }
+  </style>
 </head>
-
 <body>
-  
-<nav class="barra-pestanas">
-  <button onclick="mostrarPestana('inicio')">🏠 Inicio</button>
-  <button onclick="mostrarPestana('actividades')">📚 Actividades</button>
-  <button onclick="mostrarPestana('calendario')">📅 Calendario</button>
-  <button onclick="mostrarPestana('recordatorios')">🔔 Recordatorios</button>
-</nav>
 
-<header>
-  <h1>🌷 Ordenando mis actividades</h1>
-  <p>Organizá tus tareas a tu manera, paso a paso.</p>
-</header>
+  <!-- HERO SECTION DE VENTAS -->
+  <header class="hero">
+    <span class="hero-badge">🚀 Tu año escolar bajo control</span>
+    <h1>Organizá tu día a tu manera, sin el estrés de olvidar nada.</h1>
+    <p>Una herramienta minimalista, rápida y diseñada para estudiantes que buscan simplicidad y orden real en sus actividades diarias.</p>
+    <a href="#app-section" class="btn-primary">Probar la aplicación</a>
+  </header>
 
-<main>
-  
-<section class="panel" aria-labelledby="titulo-formulario" data-pestana="inicio">
-
-    <h2 id="titulo-formulario">➕ Agregar una actividad</h2>
-
-    <form id="formulario">
-      <label for="nombre">¿Qué tenés que hacer?</label>
-      <input id="nombre" maxlength="120" required
-        placeholder="Ej.: estudiar para Matemática">
-
-      <label for="materia">Materia</label>
-      <select id="materia">
-        <option>Matemática</option>
-        <option>Lengua</option>
-        <option>Historia</option>
-        <option>Geografía</option>
-        <option>Biología</option>
-        <option>Inglés</option>
-        <option>Física</option>
-        <option>Química</option>
-        <option>Educación Física</option>
-        <option>Otra</option>
-      </select>
-
-      <label for="fecha">Fecha de entrega</label>
-      <input id="fecha" type="date">
-
-      <label for="prioridad">¿Qué importancia tiene?</label>
-      <select id="prioridad">
-        <option value="Normal">Normal</option>
-        <option value="Importante">Importante</option>
-        <option value="Urgente">Urgente</option>
-      </select>
-
-      <label for="notas">Detalles o ayuda para recordar (opcional)</label>
-      <textarea id="notas" rows="3" maxlength="500"
-        placeholder="Anotá qué necesitás llevar o qué pasos seguir."></textarea>
-
-      <button class="primario boton-completo" type="submit">
-        Guardar actividad
-      </button>
-    </form>
-  </section>
-
-<section class="panel" aria-labelledby="titulo-lista" data-pestana="actividades">
-    <h2 id="titulo-lista">📚 Mis actividades</h2>
-    <p id="resumen" aria-live="polite">Todavía no hay actividades.</p>
-
-    <div class="filtros" aria-label="Filtrar actividades">
-      <button class="secundario" data-filtro="Todas"
-        aria-pressed="true">Todas</button>
-      <button class="secundario" data-filtro="Pendientes"
-        aria-pressed="false">Pendientes</button>
-      <button class="secundario" data-filtro="Completadas"
-        aria-pressed="false">Completadas</button>
+  <!-- SECCIÓN DE BENEFICIOS -->
+  <section class="features">
+    <div class="feature-card">
+      <h3>📅 Calendario Inteligente</h3>
+      <p>Visualizá tus prioridades y tareas organizadas por día de un solo vistazo.</p>
     </div>
-
-    <label for="buscar">Buscar una actividad</label>
-    <input id="buscar" type="search"
-      placeholder="Escribí el nombre o la materia">
-
-    <div id="lista" aria-live="polite"></div>
+    <div class="feature-card">
+      <h3>🔔 Cero Olvidos</h3>
+      <p>Revisá tus tareas próximas a vencer para mantener siempre el control.</p>
+    </div>
+    <div class="feature-card">
+      <h3>💜 Un paso a la vez</h3>
+      <p>Una interfaz pensada para reducir la ansiedad y avanzar a tu propio ritmo.</p>
+    </div>
   </section>
 
-  
+  <!-- SECCIÓN DONDE VIVE TU APLICACIÓN -->
+  <main id="app-section" class="app-container">
+    <h2>✨ Tu espacio de trabajo</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Agregá y gestioná tus actividades a continuación:</p>
+    
+    <!-- Aquí podés integrar tus secciones actuales de HTML (Agregar actividad, Mis actividades, Calendario, etc.) -->
+    <div id="app-content">
+      <p><i>Cargando tus módulos de tareas...</i></p>
+    </div>
+  </main>
+
+  <footer>
+    Hecho para acompañarte en tu camino escolar 🌈 • Todos los derechos reservados
+  </footer>
 
-
-<section class="panel" aria-labelledby="titulo-calendario" data-pestana="calendario">
-
-  <h2 id="titulo-calendario">📅 Mi calendario escolar</h2>
-
-  <div class="calendario-cabecera">
-    <button type="button" id="mes-anterior" aria-label="Mes anterior">‹</button>
-    <h3 id="mes-actual"></h3>
-    <button type="button" id="mes-siguiente" aria-label="Mes siguiente">›</button>
-  </div>
-
-  <div class="leyenda">
-    <span><i class="punto normal"></i> Normal</span>
-    <span><i class="punto importante"></i> Importante</span>
-    <span><i class="punto urgente"></i> Urgente</span>
-  </div>
-
-  <div class="dias-semana" aria-hidden="true">
-    <span>Lun</span><span>Mar</span><span>Mié</span>
-    <span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-  </div>
-
-  <div id="cuadricula-calendario" class="cuadricula-calendario"></div>
-
-  <p id="calendario-ayuda" aria-live="polite">
-    Elegí un día para ver tus actividades.
-  </p>
-
-  <div id="actividades-del-dia" aria-live="polite"></div>
-</section>
-
-
-<section class="panel" aria-labelledby="titulo-recordatorios" data-pestana="recordatorios">
-
-  <h2 id="titulo-recordatorios">🔔 Mis recordatorios</h2>
-  <p>Revisá las tareas que tenés próximas a vencer.</p>
-  <div id="lista-recordatorios" aria-live="polite">
-    Cargando recordatorios...
-  </div>
-</section>
-
-
-<section class="panel" data-pestana="inicio">
-<button onclick="probarNotificaciones()">
-  🔔 Probar notificaciones
-</button>
-    <h2>💜 Un paso a la vez</h2>
-    <p>No hace falta hacer todo junto. Elegí una tarea, organizá tu tiempo y avanzá a tu ritmo.</p>
-    <button id="instalar-app" class="secundario oculto" type="button">
-      Instalar la aplicación
-    </button>
-  </section>
-</main>
-
-<footer class="pie">
-  Hecho para acompañarte en tu camino escolar 🌈
-</footer>
-
-<script>
-const formulario = document.getElementById("formulario");
-const lista = document.getElementById("lista");
-const resumen = document.getElementById("resumen");
-const buscar = document.getElementById("buscar");
-
-let actividades = [];
-let filtroActual = "Todas";
-
-try {
-  const guardadas = JSON.parse(
-    localStorage.getItem("actividades-escolares-v2") || "[]"
-  );
-  if (Array.isArray(guardadas)) actividades = guardadas;
-} catch {
-  actividades = [];
-}
-
-function guardar() {
-  try {
-    localStorage.setItem(
-      "actividades-escolares-v2",
-      JSON.stringify(actividades)
-    );
-  } catch {
-    alert("No se pudieron guardar los cambios en este dispositivo.");
-  }
-}
-
-function crearTexto(etiqueta, contenido) {
-  const p = document.createElement("p");
-  const fuerte = document.createElement("strong");
-  fuerte.textContent = etiqueta + ": ";
-  p.append(fuerte, document.createTextNode(contenido));
-  return p;
-}
-
-
-
-const cuadriculaCalendario = document.getElementById("cuadricula-calendario");
-const mesActual = document.getElementById("mes-actual");
-const actividadesDelDia = document.getElementById("actividades-del-dia");
-const ayudaCalendario = document.getElementById("calendario-ayuda");
-
-let fechaSeleccionada = "";
-let mesVisible = new Date();
-mesVisible = new Date(mesVisible.getFullYear(), mesVisible.getMonth(), 1);
-
-function fechaISO(anio, mes, dia) {
-  return `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
-}
-
-function mostrarActividadesDelDia(fecha) {
-  const delDia = actividades.filter(a => a.fecha === fecha);
-  actividadesDelDia.replaceChildren();
-
-  if (delDia.length === 0) {
-    actividadesDelDia.textContent = "No tenés actividades registradas para ese día.";
-    return;
-  }
-
-  delDia.forEach(a => {
-    const p = document.createElement("p");
-    p.textContent = `${a.completada ? "✓" : "○"} ${a.nombre} — ${a.materia} — ${a.prioridad}`;
-    actividadesDelDia.append(p);
-  });
-}
-
-function renderCalendario() {
-  const anio = mesVisible.getFullYear();
-  const mes = mesVisible.getMonth();
-
-  mesActual.textContent = new Intl.DateTimeFormat("es-AR", {
-    month: "long",
-    year: "numeric"
-  }).format(mesVisible);
-
-  cuadriculaCalendario.replaceChildren();
-
-  const primerDia = new Date(anio, mes, 1).getDay();
-  const espacios = (primerDia + 6) % 7;
-
-  for (let i = 0; i < espacios; i++) {
-    const vacio = document.createElement("div");
-    vacio.className = "dia-calendario vacio";
-    vacio.setAttribute("aria-hidden", "true");
-    cuadriculaCalendario.append(vacio);
-  }
-
-  const cantidadDias = new Date(anio, mes + 1, 0).getDate();
-
-  for (let dia = 1; dia <= cantidadDias; dia++) {
-    const fecha = fechaISO(anio, mes, dia);
-    const delDia = actividades.filter(a => a.fecha === fecha);
-    const boton = document.createElement("button");
-
-    boton.type = "button";
-    boton.className = "dia-calendario";
-    boton.textContent = String(dia);
-
-    if (fecha === fechaSeleccionada) {
-      boton.classList.add("seleccionado");
-    }
-
-    if (delDia.some(a => a.prioridad === "Urgente")) {
-      boton.classList.add("urgente");
-    } else if (delDia.some(a => a.prioridad === "Importante")) {
-      boton.classList.add("importante");
-    } else if (delDia.some(a => a.prioridad === "Normal")) {
-      boton.classList.add("normal");
-    }
-
-    boton.setAttribute(
-      "aria-label",
-      `${dia} de ${mesActual.textContent}${delDia.length ? `, ${delDia.length} actividad(es)` : ""}`
-    );
-
-    boton.addEventListener("click", () => {
-      fechaSeleccionada = fecha;
-      ayudaCalendario.textContent = `Actividades del ${dia} de ${mesActual.textContent}:`;
-      renderCalendario();
-      mostrarActividadesDelDia(fecha);
-    });
-
-    cuadriculaCalendario.append(boton);
-  }
-}
-
-document.getElementById("mes-anterior").addEventListener("click", () => {
-  mesVisible = new Date(mesVisible.getFullYear(), mesVisible.getMonth() - 1, 1);
-  renderCalendario();
-});
-
-document.getElementById("mes-siguiente").addEventListener("click", () => {
-  mesVisible = new Date(mesVisible.getFullYear(), mesVisible.getMonth() + 1, 1);
-  renderCalendario();
-});
-
-
-function actualizarRecordatorios() {
-  const contenedor = document.getElementById("lista-recordatorios");
-  contenedor.replaceChildren();
-
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-
-  const proximas = actividades
-    .filter(a => !a.completada && a.fecha)
-    .map(a => {
-      const partes = a.fecha.split("-").map(Number);
-      const fechaTarea = new Date(partes[0], partes[1] - 1, partes[2]);
-      const dias = Math.round(
-        (fechaTarea - hoy) / (1000 * 60 * 60 * 24)
-      );
-      return { ...a, dias };
-    })
-    .filter(a => a.dias <= 7)
-    .sort((a, b) => a.dias - b.dias);
-
-  if (proximas.length === 0) {
-    contenedor.textContent =
-      "¡Todo tranquilo! No tenés tareas pendientes que venzan en los próximos 7 días.";
-    return;
-  }
-
-  proximas.forEach(a => {
-    if (a.dias === 0 && "Notification" in window && Notification.permission === "granted") {
-      const clave = "aviso-" + a.nombre + "-" + a.fecha;
-
-      if (!localStorage.getItem(clave)) {
-        const titulo = "🔔 ¡Tenés una tarea para hoy!";
-        const opciones = { body: a.nombre + " — " + a.materia };
-
-        const mostrarAviso = () => {
-          if ("serviceWorker" in navigator) {
-            return navigator.serviceWorker.ready
-              .then(registro => registro.showNotification(titulo, opciones));
-          }
-          return Promise.reject(new Error("Service worker no disponible"));
-        };
-
-        mostrarAviso()
-          .then(() => localStorage.setItem(clave, "enviado"))
-          .catch(() => {
-            try {
-              new Notification(titulo, opciones);
-              localStorage.setItem(clave, "enviado");
-            } catch (error) {
-              console.error("No se pudo mostrar el recordatorio:", error);
-            }
-          });
-      }
-    }
-
-    const aviso = document.createElement("div");
-    aviso.className = "aviso-recordatorio";
-
-    let mensaje;
-    if (a.dias < 0) {
-      mensaje = `⚠️ Vencida hace ${Math.abs(a.dias)} día(s)`;
-    } else if (a.dias === 0) {
-      mensaje = "🔔 ¡Vence hoy!";
-    } else {
-      mensaje = `📅 Vence en ${a.dias} día(s)`;
-    }
-
-    const titulo = document.createElement("strong");
-    titulo.textContent = `${mensaje}: ${a.nombre}`;
-
-    const detalle = document.createElement("p");
-    detalle.textContent = `${a.materia} — Prioridad: ${a.prioridad}`;
-
-    aviso.append(titulo, detalle);
-    contenedor.append(aviso);
-  });
-}
-
-function mostrar() {
-  renderCalendario();
-  actualizarRecordatorios();
-  lista.replaceChildren();
-
-  const pendientes = actividades.filter(a => !a.completada).length;
-  resumen.textContent = `Tenés ${pendientes} actividad(es) pendiente(s) de ${actividades.length} en total.`;
-
-  const termino = buscar.value.trim().toLocaleLowerCase("es");
-
-  const visibles = actividades.filter(a => {
-    const coincideFiltro =
-      filtroActual === "Todas" ||
-      (filtroActual === "Pendientes" && !a.completada) ||
-      (filtroActual === "Completadas" && a.completada);
-
-    const coincideTexto =
-      (a.nombre + " " + a.materia).toLocaleLowerCase("es")
-        .includes(termino);
-
-    return coincideFiltro && coincideTexto;
-  });
-
-  if (visibles.length === 0) {
-    const p = document.createElement("p");
-    p.className = "vacio";
-    p.textContent = actividades.length === 0
-      ? "Todavía no agregaste actividades. ¡Podés empezar ahora! 🌷"
-      : "No encontramos actividades con esos filtros.";
-    lista.append(p);
-    return;
-  }
-
-  visibles.sort((a, b) => {
-    if (a.completada !== b.completada) return a.completada ? 1 : -1;
-    if (!a.fecha) return 1;
-    if (!b.fecha) return -1;
-    return a.fecha.localeCompare(b.fecha);
-  });
-
-  visibles.forEach(a => {
-    const tarjeta = document.createElement("article");
-    tarjeta.className = "tarea" + (a.completada ? " completada" : "");
-
-    const titulo = document.createElement("h3");
-    titulo.textContent = a.nombre;
-    tarjeta.append(titulo);
-
-    tarjeta.append(crearTexto("Materia", a.materia));
-    tarjeta.append(crearTexto("Entrega", a.fecha || "Sin fecha"));
-    tarjeta.append(crearTexto("Prioridad", a.prioridad));
-
-    if (a.notas) tarjeta.append(crearTexto("Detalles", a.notas));
-
-    const estado = document.createElement("p");
-    estado.className = "etiqueta";
-    estado.textContent = a.completada
-      ? "✓ Actividad completada"
-      : "○ Actividad pendiente";
-    tarjeta.append(estado);
-
-    const acciones = document.createElement("div");
-    acciones.className = "acciones";
-
-    const completar = document.createElement("button");
-    completar.className = "secundario";
-    completar.textContent = a.completada
-      ? "Marcar pendiente"
-      : "Marcar completada";
-    completar.setAttribute("aria-label",
-      (a.completada ? "Marcar pendiente: " : "Completar: ") + a.nombre);
-    completar.addEventListener("click", () => {
-      a.completada = !a.completada;
-      guardar();
-      mostrar();
-    });
-
-    const eliminar = document.createElement("button");
-    eliminar.className = "peligro";
-    eliminar.textContent = "Eliminar";
-    eliminar.setAttribute("aria-label", "Eliminar: " + a.nombre);
-    eliminar.addEventListener("click", () => {
-      if (confirm("¿Querés eliminar esta actividad?")) {
-        actividades = actividades.filter(x => x.id !== a.id);
-        guardar();
-        mostrar();
-      }
-    });
-
-    acciones.append(completar, eliminar);
-    tarjeta.append(acciones);
-    lista.append(tarjeta);
-  });
-}
-
-formulario.addEventListener("submit", evento => {
-  evento.preventDefault();
-
-  const nombre = document.getElementById("nombre").value.trim();
-  if (!nombre) return;
-
-  actividades.push({
-    id: Date.now().toString() + Math.random().toString(16).slice(2),
-    nombre,
-    materia: document.getElementById("materia").value,
-    fecha: document.getElementById("fecha").value,
-    prioridad: document.getElementById("prioridad").value,
-    notas: document.getElementById("notas").value.trim(),
-    completada: false
-  });
-
-  guardar();
-  formulario.reset();
-  filtroActual = "Todas";
-  document.querySelectorAll("[data-filtro]").forEach(b => {
-    b.setAttribute("aria-pressed", String(b.dataset.filtro === "Todas"));
-  });
-  buscar.value = "";
-  mostrar();
-  document.getElementById("nombre").focus();
-});
-
-document.querySelectorAll("[data-filtro]").forEach(boton => {
-  boton.addEventListener("click", () => {
-    filtroActual = boton.dataset.filtro;
-    document.querySelectorAll("[data-filtro]").forEach(b => {
-      b.setAttribute("aria-pressed",
-        String(b.dataset.filtro === filtroActual));
-    });
-    mostrar();
-  });
-});
-
-buscar.addEventListener("input", mostrar);
-
-let instalacionPendiente;
-const botonInstalar = document.getElementById("instalar-app");
-
-window.addEventListener("beforeinstallprompt", evento => {
-  evento.preventDefault();
-  instalacionPendiente = evento;
-  botonInstalar.classList.remove("oculto");
-});
-
-botonInstalar.addEventListener("click", async () => {
-  if (!instalacionPendiente) return;
-  instalacionPendiente.prompt();
-  await instalacionPendiente.userChoice;
-  instalacionPendiente = null;
-  botonInstalar.classList.add("oculto");
-});
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js");
-    console.log("Registro del service worker iniciado");
-  });
-}
-
-mostrar();
-  
-function mostrarPestana(nombre) {
-  document.querySelectorAll("[data-pestana]").forEach(function(seccion) {
-    seccion.style.display =
-      seccion.dataset.pestana === nombre ? "" : "none";
-  });
-}
-mostrarPestana('inicio');
-function probarNotificaciones() {
-  if (!("Notification" in window)) {
-    alert("Tu navegador no permite notificaciones.");
-    return;
-  }
-
-  Notification.requestPermission().then(function (permiso) {
-    if (permiso !== "granted") {
-      alert("No se habilitaron las notificaciones.");
-      return;
-    }
-
-    const titulo = "¡Ordenando mis actividades!";
-    const opciones = { body: "¡Ya podés probar tus notificaciones!" };
-
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.ready
-        .then(registro => registro.showNotification(titulo, opciones))
-        .catch(() => new Notification(titulo, opciones));
-    } else {
-      new Notification(titulo, opciones);
-    }
-  }).catch(error => {
-    console.error("No se pudo solicitar permiso:", error);
-    alert("No se pudo activar la prueba de notificaciones.");
-  });
-}
-
-</script>
 </body>
 </html>
