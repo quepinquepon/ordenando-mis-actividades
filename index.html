@@ -1,295 +1,167 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ordenando mis actividades | Tu espacio de productividad</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #F8FAFC;
-      --card-bg: #FFFFFF;
-      --text-main: #1E293B;
-      --text-muted: #64748B;
-      --primary: #7C3AED;
-      --primary-hover: #6D28D9;
-      --accent-green: #10B981;
-      --badge-normal: #E0E7FF;
-      --text-normal: #3730A3;
-      --badge-importante: #FEF3C7;
-      --text-importante: #92400E;
-      --badge-urgente: #FEE2E2;
-      --text-urgente: #991B1B;
-      --border-radius: 16px;
-    }
+<script>
+  // Estado local y carga inicial
+  let tasks = JSON.parse(localStorage.getItem('mis_actividades')) || [];
+  let currentFilter = 'todas';
+  let currentDate = new Date();
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+  const form = document.getElementById('task-form');
+  const taskList = document.getElementById('task-list-container');
+  const remindersContainer = document.getElementById('reminders-container');
+  const calendarGrid = document.getElementById('calendar-grid-container');
 
-    /* Landing Hero */
-    .hero { text-align: center; padding: 4rem 1.5rem 2.5rem; max-width: 800px; margin: 0 auto; }
-    .hero-badge { display: inline-block; background: #EDE9FE; color: var(--primary); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.25rem; }
-    .hero h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.02em; }
-    .hero p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem; }
-
-    .btn-primary {
-      display: inline-block; background-color: var(--primary); color: white; padding: 0.875rem 2rem;
-      border-radius: 50px; font-weight: 600; text-decoration: none; border: none; cursor: pointer;
-      box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3); transition: all 0.2s ease;
-    }
-    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-
-    /* Features Grid */
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; padding: 0 1.5rem; }
-    .feature-card { background: var(--card-bg); padding: 1.75rem; border-radius: var(--border-radius); border: 1px solid #E2E8F0; }
-    .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    .feature-card p { font-size: 0.925rem; color: var(--text-muted); }
-
-    /* App Container */
-    .app-wrapper { max-width: 900px; margin: 0 auto 4rem; padding: 0 1.5rem; }
-    .app-card { background: var(--card-bg); border-radius: var(--border-radius); border: 1px solid #E2E8F0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); padding: 2rem; }
+  // 1. Guardar nueva actividad
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newTask = {
+      id: Date.now(),
+      title: document.getElementById('task-title').value.trim(),
+      date: document.getElementById('task-date').value,
+      priority: document.getElementById('task-priority').value
+    };
     
-    .app-section { margin-bottom: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid #F1F5F9; }
-    .app-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-    .app-section h2 { font-size: 1.35rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-
-    /* Forms & Inputs */
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; }
-    .input-field, .select-field { width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #CBD5E1; font-size: 0.95rem; outline: none; }
-    .input-field:focus, .select-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
-
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    
-    /* List & Filters */
-    .filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .filter-btn { background: #F1F5F9; border: none; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--text-muted); }
-    .filter-btn.active { background: var(--primary); color: white; }
-
-    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
-    .task-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0; }
-    .task-info h4 { font-size: 1rem; font-weight: 600; }
-    .task-info p { font-size: 0.85rem; color: var(--text-muted); }
-    .badge { padding: 0.25rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-    .badge-normal { background: var(--badge-normal); color: var(--text-normal); }
-    .badge-importante { background: var(--badge-importante); color: var(--text-importante); }
-    .badge-urgente { background: var(--badge-urgente); color: var(--text-urgente); }
-    .btn-delete { background: none; border: none; color: #EF4444; cursor: pointer; font-size: 0.875rem; padding: 0.25rem 0.5rem; }
-
-    /* Calendar Grid */
-    .calendar-legend { display: flex; gap: 1rem; font-size: 0.85rem; margin-bottom: 1rem; }
-    .legend-item { display: flex; align-items: center; gap: 0.35rem; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    
-    .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; text-align: center; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
-    .cal-day { min-height: 45px; border: 1px solid #E2E8F0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.875rem; transition: background 0.2s; }
-    .cal-day:hover { background: #EDE9FE; border-color: var(--primary); }
-    .cal-day.active { border: 2px solid var(--primary); background: #F3E8FF; }
-    
-    footer { text-align: center; padding: 2.5rem; color: var(--text-muted); font-size: 0.875rem; background: white; border-top: 1px solid #E2E8F0; }
-
-    @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
-  </style>
-</head>
-<body>
-
-  <!-- HERO LANDING -->
-  <header class="hero">
-    <span class="hero-badge">🚀 Tu año escolar bajo control</span>
-    <h1>Organizá tu día a tu manera, sin el estrés de olvidar nada.</h1>
-    <p>Una herramienta minimalista, rápida y diseñada para acompañarte en tu ritmo diario.</p>
-    <a href="#app-section" class="btn-primary">Empezar a organizar</a>
-  </header>
-
-  <!-- BENEFICIOS -->
-  <section class="features">
-    <div class="feature-card">
-      <h3>📅 Calendario Inteligente</h3>
-      <p>Organizá por prioridades y visualizá tus entregas de un solo vistazo.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🔔 Recordatorios Claves</h3>
-      <p>Revisá tus actividades próximas a vencer y evitá entregas a última hora.</p>
-    </div>
-    <div class="feature-card">
-      <h3>💜 Un paso a la vez</h3>
-      <p>Diseño sin distracciones creado para reducir la ansiedad y avanzar enfocado.</p>
-    </div>
-  </section>
-
-  <!-- LA APLICACIÓN -->
-  <div class="app-wrapper" id="app-section">
-    <div class="app-card">
-      
-      <!-- SECCIÓN 1: AGREGAR ACTIVIDAD -->
-      <section class="app-section">
-        <h2>➕ Agregar una actividad</h2>
-        <form id="task-form">
-          <div class="form-group">
-            <label for="task-title">Nombre de la actividad</label>
-            <input type="text" id="task-title" class="input-field" placeholder="Ej: Entregar TP de Historia" required>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="task-date">Fecha de vencimiento</label>
-              <input type="date" id="task-date" class="input-field" required>
-            </div>
-            <div class="form-group">
-              <label for="task-priority">Prioridad</label>
-              <select id="task-priority" class="select-field">
-                <option value="Normal">Normal</option>
-                <option value="Importante">Importante</option>
-                <option value="Urgente">Urgente</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary" style="width: 100%; border-radius: 10px; margin-top: 0.5rem;">Guardar Actividad</button>
-        </form>
-      </section>
-
-      <!-- SECCIÓN 2: LISTA DE ACTIVIDADES -->
-      <section class="app-section">
-        <h2>📚 Mis actividades</h2>
-        <div class="filters">
-          <button class="filter-btn active" onclick="filterTasks('todas')">Todas</button>
-          <button class="filter-btn" onclick="filterTasks('Normal')">Normales</button>
-          <button class="filter-btn" onclick="filterTasks('Importante')">Importantes</button>
-          <button class="filter-btn" onclick="filterTasks('Urgente')">Urgentes</button>
-        </div>
-        <ul class="task-list" id="task-list-container">
-          <!-- Las tareas se generan dinámicamente aquí -->
-        </ul>
-      </section>
-
-      <!-- SECCIÓN 3: CALENDARIO ESCOLAR -->
-      <section class="app-section">
-        <h2>📅 Mi calendario escolar</h2>
-        <div class="calendar-legend">
-          <span class="legend-item"><span class="dot" style="background:#7C3AED;"></span> Normal</span>
-          <span class="legend-item"><span class="dot" style="background:#D97706;"></span> Importante</span>
-          <span class="legend-item"><span class="dot" style="background:#DC2626;"></span> Urgente</span>
-        </div>
-        <div class="calendar-days">
-          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-        </div>
-        <div class="calendar-grid" id="calendar-grid-container">
-          <!-- Días del calendario generados vía JavaScript -->
-        </div>
-      </section>
-
-      <!-- SECCIÓN 4: RECORDATORIOS -->
-      <section class="app-section">
-        <h2>🔔 Mis recordatorios</h2>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Próximas actividades a vencer:</p>
-        <div id="reminders-container" class="task-list">
-          <!-- Recordatorios cargados dinámicamente -->
-        </div>
-      </section>
-
-    </div>
-  </div>
-
-  <footer>
-    Hecho para acompañarte en tu camino escolar 🌈
-  </footer>
-
-  <!-- LÓGICA DE LA APLICACIÓN -->
-  <script>
-    let tasks = JSON.parse(localStorage.getItem('mis_actividades')) || [];
-    let currentFilter = 'todas';
-
-    const form = document.getElementById('task-form');
-    const taskList = document.getElementById('task-list-container');
-    const remindersContainer = document.getElementById('reminders-container');
-    const calendarGrid = document.getElementById('calendar-grid-container');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const newTask = {
-        id: Date.now(),
-        title: document.getElementById('task-title').value,
-        date: document.getElementById('task-date').value,
-        priority: document.getElementById('task-priority').value
-      };
-      tasks.push(newTask);
-      saveAndRender();
-      form.reset();
-    });
-
-    function saveAndRender() {
-      localStorage.setItem('mis_actividades', JSON.stringify(tasks));
-      renderTasks();
-      renderReminders();
-      renderCalendar();
-    }
-
-    function deleteTask(id) {
-      tasks = tasks.filter(t => t.id !== id);
-      saveAndRender();
-    }
-
-    function filterTasks(priority) {
-      currentFilter = priority;
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      renderTasks();
-    }
-
-    function renderTasks() {
-      taskList.innerHTML = '';
-      const filtered = currentFilter === 'todas' ? tasks : tasks.filter(t => t.priority === currentFilter);
-      
-      if (filtered.length === 0) {
-        taskList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Todavía no hay actividades en esta categoría.</p>';
-        return;
-      }
-
-      filtered.forEach(task => {
-        const li = document.createElement('li');
-        li.className = 'task-item';
-        li.innerHTML = `
-          <div class="task-info">
-            <h4>${task.title}</h4>
-            <p>📅 Fecha: ${task.date}</p>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
-            <button class="btn-delete" onclick="deleteTask(${task.id})">Eliminar</button>
-          </div>
-        `;
-        taskList.appendChild(li);
-      });
-    }
-
-    function renderReminders() {
-      remindersContainer.innerHTML = '';
-      if (tasks.length === 0) {
-        remindersContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Sin tareas pendientes.</p>';
-        return;
-      }
-      const sorted = [...tasks].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 3);
-      sorted.forEach(t => {
-        const div = document.createElement('div');
-        div.className = 'task-item';
-        div.style.background = '#FFFFFF';
-        div.innerHTML = `<div><strong>${t.title}</strong> - Vence: ${t.date}</div><span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>`;
-        remindersContainer.appendChild(div);
-      });
-    }
-
-    function renderCalendar() {
-      calendarGrid.innerHTML = '';
-      for (let i = 1; i <= 31; i++) {
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'cal-day';
-        dayDiv.textContent = i;
-        calendarGrid.appendChild(dayDiv);
-      }
-    }
-
-    // Carga inicial
+    tasks.push(newTask);
     saveAndRender();
-  </script>
-</body>
-</html>
+    form.reset();
+  });
+
+  function saveAndRender() {
+    localStorage.setItem('mis_actividades', JSON.stringify(tasks));
+    renderTasks();
+    renderReminders();
+    renderCalendar();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveAndRender();
+  }
+
+  function filterTasks(priority) {
+    currentFilter = priority;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderTasks();
+  }
+
+  // 2. Renderizado de lista con formato legible (DD/MM/YYYY)
+  function renderTasks() {
+    taskList.innerHTML = '';
+    const filtered = currentFilter === 'todas' ? tasks : tasks.filter(t => t.priority === currentFilter);
+    
+    if (filtered.length === 0) {
+      taskList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Todavía no hay actividades en esta categoría.</p>';
+      return;
+    }
+
+    filtered.forEach(task => {
+      const [year, month, day] = task.date.split('-');
+      const formattedDate = `${day}/${month}/${year}`;
+      
+      const li = document.createElement('li');
+      li.className = 'task-item';
+      li.innerHTML = `
+        <div class="task-info">
+          <h4>${task.title}</h4>
+          <p>📅 Vence: <strong>${formattedDate}</strong></p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
+          <button class="btn-delete" onclick="deleteTask(${task.id})">Eliminar</button>
+        </div>
+      `;
+      taskList.appendChild(li);
+    });
+  }
+
+  // 3. Recordatorios Inteligentes (Próximos 7 días)
+  function renderReminders() {
+    remindersContainer.innerHTML = '';
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const upcoming = tasks.filter(t => {
+      const [y, m, d] = t.date.split('-');
+      const taskDate = new Date(y, m - 1, d);
+      const diffDays = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 && diffDays <= 7;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    if (upcoming.length === 0) {
+      remindersContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">¡Todo al día! Sin tareas para los próximos 7 días.</p>';
+      return;
+    }
+
+    upcoming.forEach(t => {
+      const [y, m, d] = t.date.split('-');
+      const div = document.createElement('div');
+      div.className = 'task-item';
+      div.style.background = '#FFFFFF';
+      div.innerHTML = `
+        <div>
+          <strong>${t.title}</strong> 
+          <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Vencimiento: ${d}/${m}/${y}</span>
+        </div>
+        <span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>
+      `;
+      remindersContainer.appendChild(div);
+    });
+  }
+
+  // 4. Calendario Dinámico Real
+  function renderCalendar() {
+    calendarGrid.innerHTML = '';
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    
+    // Ajustar para que la semana empiece en Lunes (0 = Lun, 6 = Dom)
+    const paddingDays = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
+    // Espacios vacíos del mes anterior
+    for (let i = 0; i < paddingDays; i++) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'cal-day';
+      emptyDiv.style.opacity = '0.3';
+      emptyDiv.style.border = 'none';
+      calendarGrid.appendChild(emptyDiv);
+    }
+
+    // Días del mes
+    for (let day = 1; day <= totalDays; day++) {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'cal-day';
+      dayDiv.innerHTML = `<span>${day}</span>`;
+
+      // Armar string de fecha actual del bucle (YYYY-MM-DD)
+      const formattedMonth = String(month + 1).padStart(2, '0');
+      const formattedDay = String(day).padStart(2, '0');
+      const dateStr = `${year}-${formattedMonth}-${formattedDay}`;
+
+      // Buscar si hay tareas este día
+      const dayTasks = tasks.filter(t => t.date === dateStr);
+      if (dayTasks.length > 0) {
+        const dotsContainer = document.createElement('div');
+        dotsContainer.style.display = 'flex';
+        dotsContainer.style.gap = '2px';
+        dotsContainer.style.marginTop = '4px';
+
+        dayTasks.forEach(t => {
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+          if (t.priority === 'Normal') dot.style.background = '#7C3AED';
+          if (t.priority === 'Importante') dot.style.background = '#D97706';
+          if (t.priority === 'Urgente') dot.style.background = '#DC2626';
+          dotsContainer.appendChild(dot);
+        });
+        dayDiv.appendChild(dotsContainer);
+      }
+
+      calendarGrid.appendChild(dayDiv);
+    }
+  }
+
+  // Inicialización
+  saveAndRender();
+</script>
