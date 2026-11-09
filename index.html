@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ordenando mis actividades | Tu espacio de productividad</title>
+  <title>Ordenando mis actividades | Versión Prémium</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -26,24 +26,20 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
 
-    /* Landing Hero */
-    .hero { text-align: center; padding: 4rem 1.5rem 2.5rem; max-width: 800px; margin: 0 auto; }
-    .hero-badge { display: inline-block; background: #EDE9FE; color: var(--primary); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.25rem; }
-    .hero h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.02em; }
-    .hero p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem; }
-
-    .btn-primary {
-      display: inline-block; background-color: var(--primary); color: white; padding: 0.875rem 2rem;
-      border-radius: 50px; font-weight: 600; text-decoration: none; border: none; cursor: pointer;
-      box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3); transition: all 0.2s ease;
+    /* Header Prémium */
+    .app-header {
+      background: white;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1000px;
+      margin: 0 auto 2rem;
+      border-radius: 0 0 16px 16px;
     }
-    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-
-    /* Features Grid */
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto 3rem; padding: 0 1.5rem; }
-    .feature-card { background: var(--card-bg); padding: 1.75rem; border-radius: var(--border-radius); border: 1px solid #E2E8F0; }
-    .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    .feature-card p { font-size: 0.925rem; color: var(--text-muted); }
+    .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.25rem; color: var(--primary); }
+    .badge-pro { background: #EDE9FE; color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 
     /* App Container */
     .app-wrapper { max-width: 900px; margin: 0 auto 4rem; padding: 0 1.5rem; }
@@ -57,15 +53,26 @@
     .progress-container { background: #E2E8F0; border-radius: 10px; height: 10px; width: 100%; margin-bottom: 1rem; overflow: hidden; }
     .progress-bar { background: var(--accent-green); height: 100%; width: 0%; transition: width 0.3s ease; }
 
-    /* Forms & Inputs */
+    /* Inputs & Forms */
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem; }
     .input-field, .select-field { width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #CBD5E1; font-size: 0.95rem; outline: none; }
     .input-field:focus, .select-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
-
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    
-    /* List & Filters */
+
+    .btn-primary {
+      display: inline-block; background-color: var(--primary); color: white; padding: 0.875rem 2rem;
+      border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; width: 100%;
+    }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-secondary {
+      background: #F1F5F9; color: var(--text-main); border: 1px solid #CBD5E1; padding: 0.5rem 1rem;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: #E2E8F0; }
+
+    /* Task List & Filters */
     .filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
     .filter-btn { background: #F1F5F9; border: none; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--text-muted); }
     .filter-btn.active { background: var(--primary); color: white; }
@@ -84,51 +91,24 @@
     .calendar-legend { display: flex; gap: 1rem; font-size: 0.85rem; margin-bottom: 1rem; }
     .legend-item { display: flex; align-items: center; gap: 0.35rem; }
     .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-    
     .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; text-align: center; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; }
     .cal-day { min-height: 55px; border: 1px solid #E2E8F0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; padding-top: 6px; font-size: 0.85rem; background: white; }
-    .cal-day span { font-weight: 500; }
-
-    /* Pricing Section */
-    .pricing-section { max-width: 800px; margin: 0 auto 4rem; padding: 0 1.5rem; text-align: center; }
-    .pricing-card { background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%); color: white; padding: 3rem 2rem; border-radius: var(--border-radius); box-shadow: 0 20px 25px -5px rgba(124, 58, 237, 0.2); }
-    .pricing-card h2 { font-size: 2rem; margin-bottom: 1rem; }
-    .price { font-size: 3rem; font-weight: 700; margin: 1.5rem 0; }
 
     footer { text-align: center; padding: 2.5rem; color: var(--text-muted); font-size: 0.875rem; background: white; border-top: 1px solid #E2E8F0; }
-
     @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-  <!-- HERO LANDING -->
-  <header class="hero">
-    <span class="hero-badge">🚀 Tu año escolar bajo control</span>
-    <h1>Organizá tu día a tu manera, sin el estrés de olvidar nada.</h1>
-    <p>Una herramienta minimalista, rápida y diseñada para acompañarte en tu ritmo diario.</p>
-    <a href="#pricing" class="btn-primary">Obtener acceso prémium</a>
-  </header>
+  <!-- BARRA DE NAVEGACIÓN PRÉMIUM -->
+  <nav class="app-header">
+    <div class="brand">🌷 Ordenando mis actividades</div>
+    <span class="badge-pro">✨ ACCESO PRÉMIUM</span>
+  </nav>
 
-  <!-- BENEFICIOS -->
-  <section class="features">
-    <div class="feature-card">
-      <h3>📅 Calendario Inteligente</h3>
-      <p>Organizá por prioridades y visualizá tus entregas en tiempo real.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🔔 Recordatorios Claves</h3>
-      <p>Revisá tus actividades próximas a vencer y evitá entregas a última hora.</p>
-    </div>
-    <div class="feature-card">
-      <h3>💜 Un paso a la vez</h3>
-      <p>Diseño sin distracciones creado para reducir la ansiedad y avanzar enfocado.</p>
-    </div>
-  </section>
-
-  <!-- LA APLICACIÓN -->
-  <div class="app-wrapper" id="app-section">
+  <!-- CONTENEDOR PRINCIPAL DE LA APP -->
+  <div class="app-wrapper">
     <div class="app-card">
       
       <!-- SECCIÓN 1: AGREGAR ACTIVIDAD -->
@@ -153,18 +133,17 @@
               </select>
             </div>
           </div>
-          <button type="submit" class="btn-primary" style="width: 100%; border-radius: 10px; margin-top: 0.5rem;">Guardar Actividad</button>
+          <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">Guardar Actividad</button>
         </form>
       </section>
 
-      <!-- SECCIÓN 2: LISTA DE ACTIVIDADES Y PROGRESO -->
+      <!-- SECCIÓN 2: MIS ACTIVIDADES Y PROGRESO -->
       <section class="app-section">
         <h2>📚 Mis actividades</h2>
         
-        <!-- Barra de Progreso -->
         <div style="margin-bottom: 1.5rem;">
           <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-            <span>Progreso general</span>
+            <span>Progreso diario</span>
             <span id="progress-text">0% completado</span>
           </div>
           <div class="progress-container">
@@ -178,9 +157,7 @@
           <button class="filter-btn" onclick="filterTasks('Importante')">Importantes</button>
           <button class="filter-btn" onclick="filterTasks('Urgente')">Urgentes</button>
         </div>
-        <ul class="task-list" id="task-list-container">
-          <!-- Dinámico -->
-        </ul>
+        <ul class="task-list" id="task-list-container"></ul>
       </section>
 
       <!-- SECCIÓN 3: CALENDARIO ESCOLAR -->
@@ -194,44 +171,36 @@
         <div class="calendar-days">
           <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
         </div>
-        <div class="calendar-grid" id="calendar-grid-container">
-          <!-- Dinámico -->
-        </div>
+        <div class="calendar-grid" id="calendar-grid-container"></div>
       </section>
 
       <!-- SECCIÓN 4: RECORDATORIOS -->
       <section class="app-section">
         <h2>🔔 Mis recordatorios</h2>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Próximas actividades a vencer (7 días):</p>
-        <div id="reminders-container" class="task-list">
-          <!-- Dinámico -->
+        <div id="reminders-container" class="task-list"></div>
+      </section>
+
+      <!-- SECCIÓN 5: GESTIÓN Y RESPALDO DE DATOS PRÉMIUM -->
+      <section class="app-section">
+        <h2>💾 Copia de Seguridad</h2>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Descargá un respaldo de tus datos para tenerlos siempre a salvo o transferirlos a otro dispositivo.</p>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn-secondary" onclick="exportData()">📥 Exportar mis tareas</button>
+          <button class="btn-secondary" onclick="document.getElementById('import-file').click()">📤 Importar copia</button>
+          <input type="file" id="import-file" style="display: none;" onchange="importData(event)" accept=".json">
         </div>
       </section>
 
     </div>
   </div>
 
-  <!-- SECCIÓN DE VENTAS / PRICING -->
-  <section class="pricing-section" id="pricing">
-    <div class="pricing-card">
-      <h2>Llevá tu productividad al siguiente nivel</h2>
-      <p>Obtené acceso vitalicio a todas las actualizaciones, diseño exclusivo y soporte directo.</p>
-      <div class="price">$4.990 ARS</div>
-      <a href="https://wa.me/5491112345678?text=¡Hola!%20Quiero%20comprar%20el%20acceso%20a%20Ordenando%20mis%20actividades" 
-         target="_blank" 
-         style="background: white; color: var(--primary); padding: 1rem 2.5rem; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-         Comprar por WhatsApp 📲
-      </a>
-    </div>
-  </section>
-
   <footer>
-    Hecho para acompañarte en tu camino escolar 🌈
+    Gracias por ser parte de Ordenando mis actividades Prémium 🌈
   </footer>
 
-  <!-- LÓGICA DE LA APLICACIÓN -->
   <script>
-    let tasks = JSON.parse(localStorage.getItem('mis_actividades')) || [];
+    let tasks = JSON.parse(localStorage.getItem('mis_actividades_pro')) || [];
     let currentFilter = 'todas';
     let currentDate = new Date();
 
@@ -256,7 +225,7 @@
     });
 
     function saveAndRender() {
-      localStorage.setItem('mis_actividades', JSON.stringify(tasks));
+      localStorage.setItem('mis_actividades_pro', JSON.stringify(tasks));
       renderTasks();
       renderReminders();
       renderCalendar();
@@ -339,7 +308,7 @@
       }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
       if (upcoming.length === 0) {
-        remindersContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">¡Todo al día! Sin tareas urgentes para los próximos 7 días.</p>';
+        remindersContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">¡Todo al día! Sin tareas pendientes para la semana.</p>';
         return;
       }
 
@@ -353,7 +322,7 @@
             <strong>${t.title}</strong> 
             <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Vencimiento: ${d}/${m}/${y}</span>
           </div>
-          <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
+          <span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>
         `;
         remindersContainer.appendChild(div);
       });
@@ -404,6 +373,35 @@
 
         calendarGrid.appendChild(dayDiv);
       }
+    }
+
+    // Exportar Datos
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "mis_actividades_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // Importar Datos
+    function importData(event) {
+      const fileReader = new FileReader();
+      fileReader.onload = function(e) {
+        try {
+          const importedTasks = JSON.parse(e.target.result);
+          if (Array.isArray(importedTasks)) {
+            tasks = importedTasks;
+            saveAndRender();
+            alert("¡Copia de seguridad restaurada con éxito!");
+          }
+        } catch (err) {
+          alert("El archivo seleccionado no es válido.");
+        }
+      };
+      fileReader.readAsText(event.target.files[0]);
     }
 
     saveAndRender();
